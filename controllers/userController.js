@@ -7,19 +7,6 @@ import Role from "../models/role.js";
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
-
-    // send a request to a weather api to get data of the next year
-    // const weather = await fetch('https://api.weatherapi.com/v1/current.json
-    // ?key=YOUR_API_KEY&q=Paris&aqi=no')
-
-    // if (weather.status !== 200) {
-    //   throw new Error('Error getting weather data')
-    // }
-
-    // const weatherData = await weather.json()
-
-    const weatherData = [];
-
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
