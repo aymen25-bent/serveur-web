@@ -14,7 +14,7 @@ import stockTransactionRoutes from "./routes/stockTransactionRoutes.js";
 import { authenticateJWT } from "./middlewares/authMiddleware.js";
 // import passport from "passport";
 import passport from "./config/passportConfig.js";
-
+//passeport
 dotenv.config();
 
 const app = express();
