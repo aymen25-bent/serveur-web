@@ -1,3 +1,4 @@
+//server that manage controllers
 import Category from "../models/category.js";
 
 export const getAllCategories = async (req, res) => {
