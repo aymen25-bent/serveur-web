@@ -5,10 +5,23 @@ import Product from "../models/product.js";
 
 export const getAllOrders = async (req, res) => {
   try {
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
+
+    const totalCount = await Order.count();
+    const totalPages = Math.ceil(totalCount / perPage);
+
     const orders = await Order.findAll({
-      include: ["user", "supplier"],
+      offset,
+      limit: parseInt(perPage),
     });
-    res.json(orders);
+
+    res.json({
+      orders,
+      totalPages,
+      currentPage: parseInt(page),
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

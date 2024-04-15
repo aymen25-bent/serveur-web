@@ -1,7 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
-
+import cors from "cors";
 import dotenv from "dotenv";
+import multer from "multer";
 
 import sequelize from "./config/database.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -22,8 +23,42 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(passport.initialize());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 // app.use(authenticateJWT);
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Save uploaded files to 'uploads' directory
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname); // Rename files to avoid conflicts
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.post("/upload", upload.single("photo"), (req, res) => {
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: "Please upload a file" });
+  }
+
+  const url = `${req.protocol}://${req.hostname}:${PORT}`;
+
+  file.url = `${url}/uploads/${file.filename}`;
+
+  console.log("url", file.url);
+
+  res.json({ url: file.url });
+});
+
+app.use("/uploads", express.static("uploads"));
 
 app.use("/users", userRoutes);
 app.use("/roles", roleRoutes);

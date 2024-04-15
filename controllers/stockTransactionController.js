@@ -3,8 +3,23 @@ import Product from "../models/product.js";
 
 export const getAllStockTransactions = async (req, res) => {
   try {
-    const stockTransactions = await StockTransaction.findAll();
-    res.status(200).json(stockTransactions);
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
+
+    const totalCount = await StockTransaction.count();
+    const totalPages = Math.ceil(totalCount / perPage);
+
+    const stockTransactions = await StockTransaction.findAll({
+      offset,
+      limit: parseInt(perPage),
+    });
+
+    res.json({
+      stockTransactions,
+      totalPages,
+      currentPage: parseInt(page),
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

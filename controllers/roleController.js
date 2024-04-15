@@ -26,6 +26,8 @@ export const updateRole = async (req, res) => {
   try {
     const role = await Role.findOne({ where: { id } });
 
+    console.log("role", id);
+
     if (!role) {
       res.status(404).json({ message: "Role not found" });
       return;

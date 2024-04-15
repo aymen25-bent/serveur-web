@@ -16,7 +16,9 @@ router.post(
   "/",
   body("type").isString().withMessage("type is required"),
   body("quantity").isInt().withMessage("quantity is required"),
-  body("transaction_date").isDate().withMessage("transaction_date is required"),
+  body("transaction_date")
+    .isString()
+    .withMessage("transaction_date is required"),
   body("remarks").isString().withMessage("remarks is required"),
   body("product_id").isInt().withMessage("product_id is required"),
   validate,
@@ -26,7 +28,9 @@ router.put(
   "/:id",
   body("type").isString().withMessage("type is required"),
   body("quantity").isInt().withMessage("quantity is required"),
-  body("transaction_date").isDate().withMessage("transaction_date is required"),
+  body("transaction_date")
+    .isString()
+    .withMessage("transaction_date is required"),
   body("remarks").isString().withMessage("remarks is required"),
   body("product_id").isInt().withMessage("product_id is required"),
   validate,

@@ -15,7 +15,7 @@ router.get("/", getAllOrders);
 router.get("/:id", getOrderById);
 router.post(
   "/",
-  body("order_date").isDate().withMessage("order_date is required"),
+  body("order_date").isString().withMessage("order_date is required"),
   body("status").isString().withMessage("status is required"),
   body("total_amount").isDecimal().withMessage("total_amount is required"),
 
@@ -29,7 +29,7 @@ router.post(
 );
 router.put(
   "/:id",
-  body("order_date").isDate().withMessage("order_date is required"),
+  body("order_date").isString().withMessage("order_date is required"),
   body("status").isString().withMessage("status is required"),
   body("total_amount").isDecimal().withMessage("total_amount is required"),
 

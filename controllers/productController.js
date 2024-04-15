@@ -4,8 +4,23 @@ import Supplier from "../models/supplier.js";
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll();
-    res.json(products);
+    const { page = 1, perPage = 10 } = req.query;
+    const offset = (page - 1) * perPage;
+
+    const totalCount = await Product.count();
+    const totalPages = Math.ceil(totalCount / perPage);
+
+    const products = await Product.findAll({
+      offset,
+      limit: parseInt(perPage),
+    });
+
+    res.json({
+      products,
+      totalPages,
+      currentPage: parseInt(page),
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

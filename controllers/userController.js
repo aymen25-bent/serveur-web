@@ -7,6 +7,19 @@ import Role from "../models/role.js";
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
+
+    // send a request to a weather api to get data of the next year
+    // const weather = await fetch('https://api.weatherapi.com/v1/current.json
+    // ?key=YOUR_API_KEY&q=Paris&aqi=no')
+
+    // if (weather.status !== 200) {
+    //   throw new Error('Error getting weather data')
+    // }
+
+    // const weatherData = await weather.json()
+
+    const weatherData = [];
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -40,7 +53,10 @@ export const createUser = async (req, res) => {
       return;
     }
 
-    const newUser = await User.create(req.body);
+    const newUser = await User.create({
+      ...req.body,
+      photoPath: req.body.photo,
+    });
     res.status(201).json(newUser);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -72,9 +88,15 @@ export const updateUser = async (req, res) => {
       return;
     }
 
-    const [updated] = await User.update(req.body, {
-      where: { id },
-    });
+    const [updated] = await User.update(
+      {
+        ...req.body,
+        photoPath: req.body.photo,
+      },
+      {
+        where: { id },
+      }
+    );
     if (updated) {
       const updatedUser = await User.findOne({ where: { id } });
       res.json(updatedUser);
@@ -131,8 +153,16 @@ export const loginUser = async (req, res, next) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, birthDate, phoneNumber } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      birthDate,
+      phoneNumber,
+      photo,
+    } = req.body;
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const exist = await User.findOne({ where: { email } });
@@ -142,10 +172,18 @@ export const registerUser = async (req, res) => {
       return;
     }
 
-    const role = await Role.findOne({ where: { id: req.body.role_id } });
+    const role = await Role.findOne({ where: { name: "user" } });
 
     if (!role) {
-      res.status(400).json({ message: "Role not found" });
+      // Create default roles if they don't exist
+      Role.findOrCreate({
+        where: { name: "admin" },
+        defaults: { name: "admin" },
+      });
+      Role.findOrCreate({
+        where: { name: "user" },
+        defaults: { name: "user" },
+      });
       return;
     }
 
@@ -156,10 +194,12 @@ export const registerUser = async (req, res) => {
       email,
       birthDate,
       phoneNumber,
-      role_id: req.body.role_id,
+      role_id: role.id,
+      photoPath: photo,
     });
     res.status(201).json(newUser);
   } catch (error) {
+    console.log("error", error);
     res.status(400).json({ message: error.message });
   }
 };
